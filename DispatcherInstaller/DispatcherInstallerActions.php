@@ -163,7 +163,7 @@ class DispatcherInstallerActions {
 
 			$line_load = "";
 
-			foreach ($package_loader as $loader) $line_load .= '$dispatcher->loadPlugin("'.$package_loader.'", "'.$plugin_path.ì');'."\n";
+			foreach ($package_loader as $loader) $line_load .= '$dispatcher->loadPlugin("'.$package_loader.'", "'.$plugin_path.'");'."\n";
 
 		}
 		else {
