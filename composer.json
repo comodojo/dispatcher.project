@@ -33,9 +33,37 @@
             "DispatcherInstaller\\DispatcherInstallerActions::postPackageUpdate"
         ]
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.0",
-        "comodojo.dispatcher.framework"
-    }
+        "comodojo/dispatcher.framework": "~3"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.framework"
+        },
+        {
+            "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.plugin.trace"
+        },
+        {
+            "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.plugin.performance"
+        },
+        {
+            "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.library.database"
+        },
+        {
+            "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.servicebundle.default"
+        },
+        {
+        "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.template.bootstrap"
+        }
+    ],
+
+
 }
