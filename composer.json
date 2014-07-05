@@ -1,0 +1,41 @@
+{
+    "name": "comodojo/dispatcher.project",
+    "description": "Composer project template for comodojo/dispatcher.framework",
+    "license": "GPL-3.0+",
+    "type": "project",
+    "keywords": [
+        "REST",
+        "php",
+        "rest services",
+        "lframework",
+        "comodojo"
+    ],
+    "homepage": "http://dispatcher.comodojo.org",
+    "authors": [
+        {
+            "name": "comodojo",
+            "email": "info@comodojo.org"
+        }
+    ],
+     "autoload": {
+        "psr-4": {
+            "DispatcherInstaller\\": "DispatcherInstaller"
+        }
+    },
+    "scripts": {
+        "post-package-install": [
+            "DispatcherInstaller\\DispatcherInstallerActions::postPackageInstall"
+        ],
+        "post-package-uninstall": [
+            "DispatcherInstaller\\DispatcherInstallerActions::postPackageUninstall"
+        ],
+        "post-package-update": [
+            "DispatcherInstaller\\DispatcherInstallerActions::postPackageUpdate"
+        ]
+    },
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.3.0",
+        "comodojo.dispatcher.framework"
+    }
+}
