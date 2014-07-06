@@ -45,11 +45,11 @@
         },
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.plugin.trace"
+            "url": "/home/marco/Workspace/dispatcher.plugin.tracer"
         },
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.plugin.performance"
+            "url": "/home/marco/Workspace/dispatcher.plugin.performer"
         },
         {
             "type": "vcs",
