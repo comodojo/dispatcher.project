@@ -50,6 +50,8 @@ class DispatcherInstallerActions {
 
 		$extra = $event->getOperation()->getPackage()->getExtra();
 
+		self::ascii();
+
 		try {
 			
 			self::packageInstall($type, $name, $extra);
@@ -60,7 +62,7 @@ class DispatcherInstallerActions {
 			
 		}
 
-		echo "DispatcherInstaller install task completed\n";
+		echo "+ DispatcherInstaller install task completed\n";
 
 	}
 
@@ -72,6 +74,8 @@ class DispatcherInstallerActions {
 
 		$extra = $event->getOperation()->getPackage()->getExtra();
 
+		self::ascii();
+
 		try {
 			
 			self::packageUninstall($type, $name, $extra);
@@ -82,7 +86,7 @@ class DispatcherInstallerActions {
 			
 		}
 
-		echo "DispatcherInstaller uninstall task completed\n";
+		echo "- DispatcherInstaller uninstall task completed\n";
 
 	}
 
@@ -90,6 +94,8 @@ class DispatcherInstallerActions {
 
 		$initial_package = $event->getOperation()->getInitialPackage();
 		$target_package  = $event->getOperation()->getTargetPackage();
+
+		self::ascii();
 
 		try {
 			
@@ -103,7 +109,7 @@ class DispatcherInstallerActions {
 
 		}
 
-		echo "DispatcherInstaller update task completed\n";
+		echo "* DispatcherInstaller update task completed\n";
 
 	}
 
@@ -163,11 +169,21 @@ class DispatcherInstallerActions {
 
 			$line_load = "";
 
-			foreach ($package_loader as $loader) $line_load .= '$dispatcher->loadPlugin("'.$package_loader.'", "'.$plugin_path.'");'."\n";
+			foreach ($package_loader as $loader) {
+
+				echo "+ Enabling plugin ".$loader."\n";
+
+				$line_load .= '$dispatcher->loadPlugin("'.$loader.'", "'.$plugin_path.'");'."\n";
+
+			}
 
 		}
 		else {
+
+			echo "+ Enabling plugin ".$package_loader."\n";
+
 			$line_load = '$dispatcher->loadPlugin("'.$package_loader.'", "'.$plugin_path.'");'."\n";
+
 		}
 		
 		$to_append = "\n".$line_mark."\n".$line_load.$line_mark."\n";
@@ -179,6 +195,8 @@ class DispatcherInstallerActions {
 	}
 
 	private static function unloadPlugin($package_name) {
+
+		echo "- Disabling plugin ".$package_name."\n";
 
 		$line_mark = "/****** PLUGIN - ".$package_name." - PLUGIN ******/";
 
@@ -231,6 +249,8 @@ class DispatcherInstallerActions {
 				$type = $pload["type"];
 				$target = $service_path.$pload["target"];
 
+				echo "+ Enabling route for service ".$service."(".$package_name.")\n";
+
 				if ( isset($pload["parameters"]) AND @is_array($pload["parameters"]) ) {
 					$line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", ' . var_export($pload["parameters"], true) . ', false);'."\n";
 				}
@@ -252,6 +272,8 @@ class DispatcherInstallerActions {
 	}
 
 	private static function unloadService($package_name) {
+
+		echo "- Disabling route for services of ".$package_name."\n";
 
 		$line_mark = "/****** SERVICE - ".$package_name." - SERVICE ******/";
 
@@ -292,6 +314,8 @@ class DispatcherInstallerActions {
 				
 				if ( in_array($folder, self::$reserved_folders) ) throw new Exception("Cannot overwrite reserved folder!");
 
+				echo "+ Creating folder ".$folder."\n";
+
 				$action = mkdir($folder, self::$mask, true);
 
 				if ( $action === false ) throw new Exception("Error creating folder ".$folder);
@@ -303,6 +327,8 @@ class DispatcherInstallerActions {
 		else {
 
 			if ( in_array($folders, self::$reserved_folders) ) throw new Exception("Cannot overwrite reserved folder!");
+
+			echo "+ Creating folder ".$folders."\n";
 
 			$action = mkdir($folders, self::$mask, true);
 
@@ -319,6 +345,8 @@ class DispatcherInstallerActions {
 			foreach ($folders as $folder) {
 				
 				if ( in_array($folder, self::$reserved_folders) ) throw new Exception("Cannot delete reserved folder!");
+
+				echo "- deleting folder ".$folder."\n";
 
 				try {
 
@@ -337,6 +365,8 @@ class DispatcherInstallerActions {
 		else {
 
 			if ( in_array($folders, self::$reserved_folders) ) throw new Exception("Cannot overwrite reserved folder!");
+
+			echo "- deleting folder ".$folders."\n";
 
 			try {
 
@@ -376,6 +406,14 @@ class DispatcherInstallerActions {
 		$action = rmdir($folder);
 
 		if ( $action === false ) throw new Exception("Error deleting folder ".$folder);
+
+	}
+
+	private static function ascii() {
+
+		echo "\n+-++-++-++-++-++-++-++-+ +-++-++-++-++-++-++-++-++-++-+\n";
+		echo "|C||o||m||o||d||o||j||o| |d||i||s||p||a||t||c||h||e||r|\n";
+		echo "+-++-++-++-++-++-++-++-+ +-++-++-++-++-++-++-++-++-++-+\n\n";
 
 	}
 
