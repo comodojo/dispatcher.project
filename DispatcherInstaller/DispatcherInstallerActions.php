@@ -237,7 +237,7 @@ class DispatcherInstallerActions {
 
 		list($author,$name) = explode("/", $package_name);
 
-		$service_path = self::$vendor.$author."/".$name."/src/";
+		$service_path = self::$vendor.$author."/".$name."/services/";
 
 		if ( is_array($package_loader) ) {
 
