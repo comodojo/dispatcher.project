@@ -54,6 +54,14 @@
         {
             "type": "vcs",
             "url": "/home/marco/Workspace/dispatcher.library.database"
+        },
+        {
+            "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.template.bootstrap"
+        },
+        {
+            "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.servicebundle.default"
         }
     ]
 
