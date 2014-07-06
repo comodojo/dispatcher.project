@@ -62,6 +62,10 @@
         {
             "type": "vcs",
             "url": "/home/marco/Workspace/dispatcher.servicebundle.default"
+        },
+        {
+            "type": "vcs",
+            "url": "/home/marco/Workspace/dispatcher.servicebundle.test"
         }
     ]
 
