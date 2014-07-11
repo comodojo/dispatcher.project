@@ -62,7 +62,7 @@ class DispatcherInstallerActions {
 			
 		}
 
-		echo "+ DispatcherInstaller install task completed\n";
+		echo "+ DispatcherInstaller install task completed\n\n";
 
 	}
 
@@ -86,7 +86,7 @@ class DispatcherInstallerActions {
 			
 		}
 
-		echo "- DispatcherInstaller uninstall task completed\n";
+		echo "- DispatcherInstaller uninstall task completed\n\n";
 
 	}
 
@@ -109,7 +109,7 @@ class DispatcherInstallerActions {
 
 		}
 
-		echo "* DispatcherInstaller update task completed\n";
+		echo "* DispatcherInstaller update task completed\n\n";
 
 	}
 
