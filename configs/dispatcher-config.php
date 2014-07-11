@@ -135,7 +135,7 @@ define('DISPATCHER_DEFAULT_ENCODING', 'UTF-8');
  * WARNING: this constant should be in plain, uppercased, comma separated,
  * not spaced text.
  */
-define('DISPATCHER_SUPPORTED_METHODS', 'GET,PUT,POST,DELETE,ANY');
+define('DISPATCHER_SUPPORTED_METHODS', 'GET,PUT,POST,DELETE');
 
 ######### END DISPATCHER PROPERTIES #########
 
