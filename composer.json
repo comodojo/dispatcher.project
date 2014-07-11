@@ -66,6 +66,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/comodojo/dispatcher.servicebundle.test"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/comodojo/dispatcher.plugin.test"
         }
     ]
 
