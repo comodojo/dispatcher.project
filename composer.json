@@ -41,31 +41,31 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.framework"
+            "url": "https://github.com/comodojo/dispatcher.framework"
         },
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.plugin.tracer"
+            "url": "https://github.com/comodojo/dispatcher.plugin.tracer"
         },
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.plugin.performer"
+            "url": "https://github.com/comodojo/dispatcher.plugin.performer"
         },
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.library.database"
+            "url": "https://github.com/comodojo/dispatcher.library.database"
         },
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.template.bootstrap"
+            "url": "https://github.com/comodojo/dispatcher.template.bootstrap"
         },
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.servicebundle.default"
+            "url": "https://github.com/comodojo/dispatcher.servicebundle.default"
         },
         {
             "type": "vcs",
-            "url": "/home/marco/Workspace/dispatcher.servicebundle.test"
+            "url": "https://github.com/comodojo/dispatcher.servicebundle.test"
         }
     ]
 
