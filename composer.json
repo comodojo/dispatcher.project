@@ -8,12 +8,16 @@
         "php",
         "rest services",
         "lframework",
-        "comodojo"
+        "comodojo",
+        "installer"
     ],
     "homepage": "http://dispatcher.comodojo.org",
+     "support": {
+        "issues": "https://github.com/comodojo/dispatcher.project/issues"
+    },
     "authors": [
         {
-            "name": "comodojo",
+            "name": "Marco Giovinazzi",
             "email": "info@comodojo.org"
         }
     ],
@@ -37,40 +41,5 @@
     "require": {
         "php": ">=5.3.0",
         "comodojo/dispatcher.framework": "dev-master"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/comodojo/dispatcher.framework"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/comodojo/dispatcher.plugin.tracer"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/comodojo/dispatcher.plugin.performer"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/comodojo/dispatcher.library.database"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/comodojo/dispatcher.template.bootstrap"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/comodojo/dispatcher.servicebundle.default"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/comodojo/dispatcher.servicebundle.test"
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/comodojo/dispatcher.plugin.test"
-        }
-    ]
-
+    }
 }
