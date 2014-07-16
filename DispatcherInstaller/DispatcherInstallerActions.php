@@ -247,15 +247,20 @@ class DispatcherInstallerActions {
 
 				$service = $pload["service"];
 				$type = $pload["type"];
-				$target = $service_path.$pload["target"];
+				
+				if ( array_key_exists("relative",$pload) ) $relative = filter_var($pload["relative"], FILTER_VALIDATE_BOOLEAN);
+				else $relative = false;
+
+				if ( $relative ) $target = $pload["target"];
+				else $target = $service_path.$pload["target"];
 
 				echo "+ Enabling route for service ".$service."(".$package_name.")\n";
 
 				if ( isset($pload["parameters"]) AND @is_array($pload["parameters"]) ) {
-					$line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", ' . var_export($pload["parameters"], true) . ', false);'."\n";
+					$line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", ' . var_export($pload["parameters"], true) . ', '.($relative ? 'true' : 'false').');'."\n";
 				}
 				else {
-					$line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", Array(), false);'."\n";
+					$line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", Array(), '.($relative ? 'true' : 'false').');'."\n";
 				}
 
 			}
