@@ -313,8 +313,6 @@ class DispatcherInstallerActions {
 
 	private static function create_folders($folders) {
 
-		if ( empty($folders) ) return;
-
 		if ( is_array($folders) ) {
 
 			foreach ($folders as $folder) {
@@ -393,7 +391,7 @@ class DispatcherInstallerActions {
 
 	private static function recursive_unlink($folder) {
 
-		foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST) as $path) {
+		foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $path) {
 			
 			$pathname = $path->getPathname();
 
