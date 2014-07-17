@@ -254,7 +254,7 @@ class DispatcherInstallerActions {
 				if ( $relative ) $target = $pload["target"];
 				else $target = $service_path.$pload["target"];
 
-				echo "+ Enabling route for service ".$service."(".$package_name.")\n";
+				echo "+ Enabling ".($relative ? "relative" : "absolute")." route for service ".$service."(".$package_name.")\n";
 
 				if ( isset($pload["parameters"]) AND @is_array($pload["parameters"]) ) {
 					$line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", ' . var_export($pload["parameters"], true) . ', '.($relative ? 'true' : 'false').');'."\n";
@@ -313,6 +313,8 @@ class DispatcherInstallerActions {
 
 	private static function create_folders($folders) {
 
+		if ( empty($folders) ) return;
+
 		if ( is_array($folders) ) {
 
 			foreach ($folders as $folder) {
@@ -340,6 +342,8 @@ class DispatcherInstallerActions {
 			if ( $action === false ) throw new Exception("Error creating folder ".$folders);
 
 		}
+
+		echo "+ PLEASE REMEMBER to chmod and/or chown created folders according to your needs.\n";
 
 	}
 
