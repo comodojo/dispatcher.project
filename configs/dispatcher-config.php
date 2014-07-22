@@ -23,33 +23,44 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-######## BEGIN GLOBAL PROPERTIES ########
-
-/**
- * Enable debug globally
- */
-define('COMODOJO_GLOBAL_DEBUG_ENABLED', false);
-
-/**
- * Debug log file (NULL will log to error_log)
- */
-define('COMODOJO_GLOBAL_DEBUG_FILE', NULL);
-
-/**
- * Debug level
- *
- * In order of relevance:
- * - DEBUG
- * - INFO
- * - WARNING
- * - ERROR
- */
-define('COMODOJO_GLOBAL_DEBUG_LEVEL', 'DEBUG');
-
-######### END GLOBAL PROPERTIES #########
-
 ######## BEGIN DISPATCHER PROPERTIES ########
 
+/**
+ * Enable/disable logger
+ *
+ * @static	bool
+ */
+define('DISPATCHER_LOG_ENABLED', true);
+
+/**
+ * Logger name
+ *
+ * @static	bool
+ */
+define('DISPATCHER_LOG_NAME', 'dispatcher');
+
+/**
+ * Log target
+ *
+ * - if NULL, logger will log to error_log
+ * - if string, it will be the filename to log to
+ *
+ * @static	bool
+ */
+define('DISPATCHER_LOG_TARGET', 'dispatcher.log');
+
+/**
+ * Debug level, as in http://www.php-fig.org/psr/psr-3/
+ *
+ * @static	string
+ */
+define('DISPATCHER_LOG_LEVEL', 'ERROR');
+
+/**
+ * Dispatcher real path
+ *
+ * @static	string
+ */
 define("DISPATCHER_REAL_PATH",realpath(dirname(__FILE__))."/../");
 
 
@@ -169,7 +180,11 @@ define('DISPATCHER_PLUGINS_FOLDER', DISPATCHER_REAL_PATH."plugins/");
 */
 define('DISPATCHER_TEMPLATES_FOLDER', DISPATCHER_REAL_PATH."templates/");
 
+/**
+* Logs folder.
+* 
+* @static	string
+*/
+define('DISPATCHER_LOG_FOLDER', DISPATCHER_REAL_PATH."logs/");
 
 ######### END DISPATCHER FOLDERS #########
-
-?>

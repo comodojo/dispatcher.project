@@ -1,4 +1,6 @@
-<?php use comodojo\Dispatcher\dispatcher;
+<?php
+
+use Comodojo\Dispatcher\Dispatcher;
 
 /**
  * Comodojo dispatcher - REST services microframework
@@ -53,7 +55,7 @@ require 'vendor/autoload.php';
  | Create the dispatcher instance
  |
  */
-$dispatcher = new dispatcher();
+$dispatcher = new Dispatcher();
 
 /*
  |--------------------------------
@@ -85,5 +87,3 @@ require "configs/plugins-config.php";
  |
  */
 $dispatcher->dispatch();
-
-?>

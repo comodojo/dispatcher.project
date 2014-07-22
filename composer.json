@@ -23,18 +23,18 @@
     ],
      "autoload": {
         "psr-4": {
-            "DispatcherInstaller\\": "DispatcherInstaller"
+            "Comodojo\\DispatcherInstaller\\": "DispatcherInstaller"
         }
     },
     "scripts": {
         "post-package-install": [
-            "DispatcherInstaller\\DispatcherInstallerActions::postPackageInstall"
+            "Comodojo\\DispatcherInstaller\\DispatcherInstallerActions::postPackageInstall"
         ],
         "post-package-uninstall": [
-            "DispatcherInstaller\\DispatcherInstallerActions::postPackageUninstall"
+            "Comodojo\\DispatcherInstaller\\DispatcherInstallerActions::postPackageUninstall"
         ],
         "post-package-update": [
-            "DispatcherInstaller\\DispatcherInstallerActions::postPackageUpdate"
+            "Comodojo\\DispatcherInstaller\\DispatcherInstallerActions::postPackageUpdate"
         ]
     },
     "minimum-stability": "dev",
