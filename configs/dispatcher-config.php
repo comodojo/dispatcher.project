@@ -30,12 +30,12 @@
  *
  * @static	bool
  */
-define('DISPATCHER_LOG_ENABLED', true);
+define('DISPATCHER_LOG_ENABLED', false);
 
 /**
  * Logger name
  *
- * @static	bool
+ * @static	string
  */
 define('DISPATCHER_LOG_NAME', 'dispatcher');
 
@@ -45,9 +45,11 @@ define('DISPATCHER_LOG_NAME', 'dispatcher');
  * - if NULL, logger will log to error_log
  * - if string, it will be the filename to log to
  *
- * @static	bool
+ * PLEASE NOTE: verify filesystem permissions on log folder BEFORE enabling file logging
+ *
+ * @static	string
  */
-define('DISPATCHER_LOG_TARGET', 'dispatcher.log');
+define('DISPATCHER_LOG_TARGET', null);
 
 /**
  * Debug level, as in http://www.php-fig.org/psr/psr-3/
