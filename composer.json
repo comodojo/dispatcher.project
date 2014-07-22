@@ -21,7 +21,7 @@
             "email": "info@comodojo.org"
         }
     ],
-     "autoload": {
+    "autoload": {
         "psr-4": {
             "Comodojo\\DispatcherInstaller\\": "DispatcherInstaller"
         }
