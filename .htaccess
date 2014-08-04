@@ -4,8 +4,10 @@ Options +FollowSymLinks
 IndexIgnore */*
 # Turn on rewrite engine
 RewriteEngine On
-# Disable rewrtite engine if target is vendor, services or templates folders
+# Disable rewrite engine if target is vendor, services or templates folders
 RewriteRule ^(vendor|services|templates)($|/) - [L]
+# Disable rewrite for favicon
+RewriteCond %{REQUEST_URI} !=/favicon.ico
 # Do rewrite!
 RewriteRule . index.php
 </IfModule>

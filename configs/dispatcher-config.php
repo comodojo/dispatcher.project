@@ -84,7 +84,10 @@ define("DISPATCHER_REAL_PATH",realpath(dirname(__FILE__))."/../");
 define ('DISPATCHER_ENABLED', true);
 
 /**
-* If true, dispatcher will use rewrite module to acquire service path and attibutes
+* If true, dispatcher will use rewrite module to acquire service path and attibutes.
+*
+* If you prefer to turn this feature off, remember to remove/rename .htaccess file in
+* parent folder and/or disable the apache rewrite module.
 * 
 * @static	bool
 * @default	true
