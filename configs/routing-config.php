@@ -9,7 +9,7 @@
  *
  * WARNING: DO NOT close PHP tag in this file!
  *
- * @package		Comodojo dispatcher (Spare Parts)
+ * @package     Comodojo dispatcher
  * @author		comodojo <info@comodojo.org>
  * @license		GPL-3.0+
  *

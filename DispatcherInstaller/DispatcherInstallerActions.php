@@ -3,11 +3,11 @@
 /**
  * Dispatcher installer - a simple class (static methods) to manage plugin installations
  *
- * It currently support:
+ * It currently supports:
  * - dispatcher-plugin - generic plugins such as tracer, database, ...
  * - dispatcher-service-bundle - service bundles
  * 
- * @package     Comodojo dispatcher (Spare Parts)
+ * @package     Comodojo dispatcher
  * @author      comodojo <info@comodojo.org>
  * @license     GPL-3.0+
  *
