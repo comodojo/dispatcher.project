@@ -4,7 +4,7 @@
  * This is the main dispatcher configuration.
  *
  * @package     Comodojo dispatcher
- * @author		comodojo <info@comodojo.org>
+ * @author		Marco Giovinazzi <info@comodojo.org>
  * @license		GPL-3.0+
  *
  * LICENSE:
@@ -158,38 +158,38 @@ define('DISPATCHER_SUPPORTED_METHODS', 'GET,PUT,POST,DELETE');
 ######## BEGIN DISPATCHER FOLDERS ########
 
 /**
-* Cache folder.
-* 
-* @static	string
-*/
+ * Cache folder.
+ * 
+ * @static	string
+ */
 define('DISPATCHER_CACHE_FOLDER', DISPATCHER_REAL_PATH."cache/");
 
 /**
-* Services folder.
-* 
-* @static	string
-*/
+ * Services folder.
+ * 
+ * @static	string
+ */
 define('DISPATCHER_SERVICES_FOLDER', DISPATCHER_REAL_PATH."services/");
 
 /**
-* Plugins folder.
-* 
-* @static	string
-*/
+ * Plugins folder.
+ * 
+ * @static	string
+ */
 define('DISPATCHER_PLUGINS_FOLDER', DISPATCHER_REAL_PATH."plugins/");
 
 /**
-* Templates folder.
-* 
-* @static	string
-*/
+ * Templates folder.
+ * 
+ * @static	string
+ */
 define('DISPATCHER_TEMPLATES_FOLDER', DISPATCHER_REAL_PATH."templates/");
 
 /**
-* Logs folder.
-* 
-* @static	string
-*/
+ * Logs folder.
+ * 
+ * @static	string
+ */
 define('DISPATCHER_LOG_FOLDER', DISPATCHER_REAL_PATH."logs/");
 
 ######### END DISPATCHER FOLDERS #########

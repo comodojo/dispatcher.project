@@ -8,7 +8,7 @@
  * - dispatcher-service-bundle - service bundles
  * 
  * @package     Comodojo dispatcher
- * @author      comodojo <info@comodojo.org>
+ * @author      Marco Giovinazzi <info@comodojo.org>
  * @license     GPL-3.0+
  *
  * LICENSE:

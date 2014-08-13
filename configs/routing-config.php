@@ -3,14 +3,14 @@
 /**
  * This is the routing table configuration file
  *
- * It should contains method invocations like:
+ * It should contain method invocations like:
  *
  *  $dispatcher->setRoute("[SERVICE]", "[ROUTE_TYPE]", "[ROUTE_TARGET]", (optional)"[PARAMETERS]", (optional)"[RELATIVE]");
  *
  * WARNING: DO NOT close PHP tag in this file!
  *
  * @package     Comodojo dispatcher
- * @author		comodojo <info@comodojo.org>
+ * @author		Marco Giovinazzi <info@comodojo.org>
  * @license		GPL-3.0+
  *
  * LICENSE:
