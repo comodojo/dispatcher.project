@@ -133,14 +133,15 @@ define('DISPATCHER_CACHE_FAIL_SILENTLY', true);
 define('DISPATCHER_DEFAULT_ENCODING', 'UTF-8');
 
 /**
- * HTTP supported methods: GET, PUT, POST, DELETE or - as wildcard - ANY.
+ * HTTP supported methods.
  *
- * You should not modify this value, because each service can implement one or
- * more HTTP methods independently. This value may change the Allow Response
+ * This represent the pool of framework-supported HTTP methods, but each service can
+ * implement one or more methods independently. This value may change the Allow Response
  * Header in case of 405 response.
  * 
- * The one and only reason you may want to modify this value is to limit access
- * at your services to a subset of HTTP methods (i.e. if you want to disable PUT
+ * Change this value only if:
+ * - you need to support custom http method (like PUSH)
+ * - you want to disable globally a subset of HTTP methods (i.e. if you want to disable PUT
  * requests globally, you can omit it from this definition; method will be 
  * ignored even though service implements it - or implements ANY wildcard).
  *
@@ -150,8 +151,10 @@ define('DISPATCHER_DEFAULT_ENCODING', 'UTF-8');
  *
  * WARNING: this constant should be in plain, uppercased, comma separated,
  * not spaced text.
+ *
+ * WARNING.2: DO NOT USE a "ANY" method here or it will override the embedded wildcard ANY.
  */
-define('DISPATCHER_SUPPORTED_METHODS', 'GET,PUT,POST,DELETE');
+define('DISPATCHER_SUPPORTED_METHODS', 'GET,PUT,POST,DELETE,OPTIONS,HEAD');
 
 ######### END DISPATCHER PROPERTIES #########
 

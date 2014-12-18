@@ -34,13 +34,19 @@ class DispatcherInstallerActions {
 
     private static $vendor = 'vendor/';
 
+    private static $dispatcher_cfg = 'configs/dispatcher-config.php';
+
     private static $plugins_cfg = 'configs/plugins-config.php';
 
     private static $routing_cfg = 'configs/routing-config.php';
 
+    private static $known_types = array('dispatcher-plugin', 'dispatcher-service-bundle', 'dispatcher-bundle');
+
     private static $reserved_folders = Array('DispatcherInstaller','cache','configs','lib','plugins','services','templates','vendor');
 
     private static $mask = 0644;
+
+    private static $known_service_types = array('ROUTE', 'ERROR', 'REDIRECT');
 
     public static function postPackageInstall(Event $event) {
 
@@ -49,6 +55,8 @@ class DispatcherInstallerActions {
         $name = $event->getOperation()->getPackage()->getName();
 
         $extra = $event->getOperation()->getPackage()->getExtra();
+
+        if ( !in_array($type, self::$known_types) ) return;
 
         self::ascii();
 
@@ -74,6 +82,8 @@ class DispatcherInstallerActions {
 
         $extra = $event->getOperation()->getPackage()->getExtra();
 
+        if ( !in_array($type, self::$known_types) ) return;
+
         self::ascii();
 
         try {
@@ -93,15 +103,30 @@ class DispatcherInstallerActions {
     public static function postPackageUpdate(Event $event) {
 
         $initial_package = $event->getOperation()->getInitialPackage();
-        $target_package  = $event->getOperation()->getTargetPackage();
+
+        $initial_package_type = $initial_package->getType();
+
+        $initial_package_name = $initial_package->getName();
+
+        $initial_package_extra = $initial_package->getExtra();
+
+        $target_package  = $event->getOperation()->getTargetPackage(); 
+
+        $target_package_type = $target_package->getType();
+
+        $target_package_name = $target_package->getName();
+
+        $target_package_extra = $target_package->getExtra();
+
+        if ( !in_array($initial_package_type, self::$known_types) AND !in_array($target_package_type, self::$known_types) ) return;
 
         self::ascii();
 
         try {
             
-            self::packageUninstall($initial_package->getType(), $initial_package->getName(), $initial_package->getExtra());
+            self::packageUninstall($initial_package_type, $initial_package_name, $initial_package_extra);
 
-            self::packageInstall($target_package->getType(), $target_package->getName(), $target_package->getExtra());
+            self::packageInstall($target_package_type, $target_package_name, $target_package_extra);
 
         } catch (Exception $e) {
             
@@ -121,13 +146,25 @@ class DispatcherInstallerActions {
 
         $folders_to_create = isset($extra["comodojo-folders-create"]) ? $extra["comodojo-folders-create"] : Array();
 
+        $configlines_to_create = isset($extra["comodojo-configlines-create"]) ? $extra["comodojo-configlines-create"] : Array();
+
         try {
             
             if ( $type == "dispatcher-plugin" ) self::loadPlugin($name, $plugin_loaders);
 
             if ( $type == "dispatcher-service-bundle" ) self::loadService($name, $service_loaders);
 
+            if ( $type == "dispatcher-bundle" ) {
+
+                self::loadPlugin($name, $plugin_loaders);
+
+                self::loadService($name, $service_loaders);
+            
+            }
+
             self::create_folders($folders_to_create);
+
+            self::create_configlines($name, $configlines_to_create);
 
         } catch (Exception $e) {
             
@@ -141,13 +178,25 @@ class DispatcherInstallerActions {
         
         $folders_to_delete = isset($extra["comodojo-folders-create"]) ? $extra["comodojo-folders-create"] : Array();
 
+        $configlines_to_delete = isset($extra["comodojo-configlines-create"]) ? $extra["comodojo-folders-create"] : Array();
+
         try {
             
             if ( $type == "dispatcher-plugin" ) self::unloadPlugin($name);
 
             if ( $type == "dispatcher-service-bundle" ) self::unloadService($name);
 
+            if ( $type == "dispatcher-bundle" ) {
+
+                self::unloadPlugin($name);
+
+                self::unloadService($name);
+            
+            }
+
             self::delete_folders($folders_to_delete);
+
+            self::delete_configlines($name, $configlines_to_delete);
 
         } catch (Exception $e) {
             
@@ -190,7 +239,7 @@ class DispatcherInstallerActions {
 
         $action = file_put_contents(self::$plugins_cfg, $to_append, FILE_APPEND | LOCK_EX);
 
-        if ( $action === false ) throw new Exception("Cannot activate plugin");
+        if ( $action === false ) throw new Exception("Cannot activate plugin " . $package_name);
 
     }
 
@@ -225,7 +274,7 @@ class DispatcherInstallerActions {
 
         $action = file_put_contents(self::$plugins_cfg, implode("\n", array_values($cfg)), LOCK_EX);
 
-        if ( $action === false ) throw new Exception("Cannot deactivate plugin");
+        if ( $action === false ) throw new Exception("Cannot deactivate plugin " . $package_name);
 
     }
 
@@ -243,36 +292,63 @@ class DispatcherInstallerActions {
 
             foreach ($package_loader as $pload) {
 
-                if ( !array_key_exists("service",$pload) OR !array_key_exists("type",$pload) OR !array_key_exists("target",$pload) ) throw new Exception("Wrong service route");
+                // if service, type or target values are not in place, throw an exception dumping the current pload
+                if ( !array_key_exists("service",$pload) OR !array_key_exists("type",$pload) OR !array_key_exists("target",$pload) ) throw new Exception( "Wrong service route: " . var_export($pload,true) );
 
+                // get service specifications
                 $service = $pload["service"];
-                $type = $pload["type"];
-                
-                if ( array_key_exists("relative",$pload) ) $relative = filter_var($pload["relative"], FILTER_VALIDATE_BOOLEAN);
-                else $relative = false;
 
-                if ( $relative ) $target = $pload["target"];
-                else $target = $service_path.$pload["target"];
+                $type = strtoupper($pload["type"]);
 
-                echo "+ Enabling ".($relative ? "relative" : "absolute")." route for service ".$service."(".$package_name.")\n";
+                $relative = ( array_key_exists("relative",$pload) ? filter_var($pload["relative"], FILTER_VALIDATE_BOOLEAN) : false;
 
-                if ( isset($pload["parameters"]) AND @is_array($pload["parameters"]) ) {
-                    $line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", ' . var_export($pload["parameters"], true) . ', '.($relative ? 'true' : 'false').');'."\n";
+                $parameters = ( isset($pload["parameters"]) AND @is_array($pload["parameters"]) ) ? $pload["parameters"] : null;
+
+                // if service type is unknown, throw an error
+                if ( !in_array($type, self::$known_service_types) ) throw new Exception( "Unknown service type: " . $type );
+
+                // push service route depending on service type
+                switch ($type) {
+
+                    case 'ROUTE':
+                        
+                        // route can be relative, so check for it
+                        $target = $relative ? $pload["target"] : $service_path.$pload["target"];
+
+                        break;
+                    
+                    case 'REDIRECT':
+                        
+                        // redirect routes could also be relative, but in this case url composition is handled by dispatcher class
+                        $target = $pload["target"];
+
+                        break;
+                    
+                    case 'ERROR':
+
+                        // target in error routes represents content and it can not be relative
+                        $relative = false;
+
+                        $target = $pload["target"];
+
+                        break;
+                    
                 }
-                else {
-                    $line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", Array(), '.($relative ? 'true' : 'false').');'."\n";
-                }
+
+                // print route informations
+                echo "+ Enabling ".($relative ? "relative" : "absolute")." route (type: ".$type.") for service ".$service."(".$package_name.")\n";
+
+                $line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", ' . var_export($parameters, true) . ', '.($relative ? 'true' : 'false').');'."\n";
 
             }
 
-        }
-        else throw new Exception("Wrong service loader");
+        } else throw new Exception("Wrong service loader");
         
         $to_append = "\n".$line_mark."\n".$line_load.$line_mark."\n";
 
         $action = file_put_contents(self::$routing_cfg, $to_append, FILE_APPEND | LOCK_EX);
 
-        if ( $action === false ) throw new Exception("Cannot activate service route");
+        if ( $action === false ) throw new Exception("Cannot activate service route for package " . $package_name);
 
     }
 
@@ -307,11 +383,13 @@ class DispatcherInstallerActions {
 
         $action = file_put_contents(self::$routing_cfg, implode("\n", array_values($cfg)), LOCK_EX);
 
-        if ( $action === false ) throw new Exception("Cannot deactivate route");
+        if ( $action === false ) throw new Exception("Cannot deactivate route for package " . $package_name);
 
     }
 
     private static function create_folders($folders) {
+
+        if ( empty($folders) ) return;
 
         if ( is_array($folders) ) {
 
@@ -346,6 +424,8 @@ class DispatcherInstallerActions {
     }
 
     private static function delete_folders($folders) {
+
+        if ( empty($folders) ) return;
         
         if ( is_array($folders) ) {
 
@@ -416,11 +496,89 @@ class DispatcherInstallerActions {
 
     }
 
+    private static function create_configlines($package_name, $lines) {
+
+        if ( empty($lines) ) return;
+
+        echo "+ Writing configuration lines for package ".$package_name."\n";
+
+        $line_mark = "/****** CONFIGLINES - ".$package_name." - CONFIGLINES ******/";
+
+        $line_load = "";
+
+        if ( is_array($lines) ) {
+
+            foreach ($lines as $constant => $value) {
+                
+                if ( !is_scalar($value) ) throw new Exception("A configuration line value should be scalar, please check value of " . $constant . " in " . $package_name);
+
+                $value = ( is_bool($value) OR is_numeric($value) ) ? $value : '"'.$value.'"';
+
+                $line_load .= "define('".$constant."', ".$value.");"."\n";
+
+            }
+
+        } else throw new Exception("Wrong configuration lines for package " . $package_name);
+
+        $to_append = "\n".$line_mark."\n".$line_load.$line_mark."\n";
+
+        $action = file_put_contents(self::$dispatcher_cfg, $to_append, FILE_APPEND | LOCK_EX);
+
+        if ( $action === false ) throw new Exception("Cannot write configuration lines for package " . $package_name);
+
+    }
+
+    private static function delete_configlines($package_name, $lines) {
+
+        if ( empty($lines) ) return;
+
+        echo "- Deleting configuration lines for package ".$package_name."\n";
+
+        $line_mark = "/****** CONFIGLINES - ".$package_name." - CONFIGLINES ******/";
+
+        $cfg = file(self::$dispatcher_cfg, FILE_IGNORE_NEW_LINES);
+
+        $found = false;
+
+        foreach ($cfg as $position => $line) {
+            
+            if ( stristr($line, $line_mark) ) {
+
+                unset($cfg[$position]);
+
+                $found = !$found;
+
+            }
+
+            else {
+
+                if ( $found ) unset($cfg[$position]);
+                else continue;
+
+            }
+
+        }
+
+        $action = file_put_contents(self::$dispatcher_cfg, implode("\n", array_values($cfg)), LOCK_EX);
+
+        if ( $action === false ) throw new Exception("Cannot delete configuration lines for package " . $package_name);
+
+    }
+
     private static function ascii() {
 
-        echo "\n+-++-++-++-++-++-++-++-+ +-++-++-++-++-++-++-++-++-++-+\n";
-        echo "|C||o||m||o||d||o||j||o| |d||i||s||p||a||t||c||h||e||r|\n";
-        echo "+-++-++-++-++-++-++-++-+ +-++-++-++-++-++-++-++-++-++-+\n\n";
+        echo "\n   ______                          __        __          \n";
+        echo "  / ____/___  ____ ___  ____  ____/ /___    / /___         \n";
+        echo " / /   / __ \/ __ `__ \/ __ \/ __  / __ \  / / __ \        \n";
+        echo "/ /___/ /_/ / / / / / / /_/ / /_/ / /_/ / / / /_/ /        \n";
+        echo "\____/\____/_/ /_/ /_/\____/\____/\____/_/ /\____/         \n";
+        echo "------------------------------------- /___/ -----          \n";
+        echo "            __ _                 __       __               \n";
+        echo "       ____/ /_/________  ____  / /______/ /_  ___  _____  \n";
+        echo "      / __  / / ___/ __ \/ __ `/ __/ ___/ __ \/ _ \/ ___/  \n";
+        echo "     / /_/ / (__  ) /_/ / /_/ / /_/ /__/ / / /  __/ /      \n";
+        echo "     \____/_/____/ / __/\____/\__/\___/_/ /_/\___/_/       \n";
+        echo "     ------------ /_/ ---------------------------------    \n\n";
 
     }
 
