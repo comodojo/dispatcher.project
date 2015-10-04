@@ -86,4 +86,4 @@ require "configs/plugins-config.php";
  | Handle request, dispatch result :)
  |
  */
-$dispatcher->dispatch();
+exit( $dispatcher->dispatch() );
