@@ -1,14 +1,17 @@
 <?php namespace Comodojo\DispatcherInstaller;
 
+use \Comodojo\DispatcherInstaller\AbstractInstaller;
+use \Comodojo\DispatcherInstaller\DispatcherInstaller;
+use \Comodojo\DispatcherInstaller\FileInstaller;
+use \Composer\Script\Event;
+use \Composer\Installer\PackageEvent;
+use \Exception;
+
 /**
- * Dispatcher installer - a simple class (static methods) to manage plugin installations
- *
- * It currently supports:
- * - dispatcher-plugin - generic plugins such as tracer, database, ...
- * - dispatcher-service-bundle - service bundles
+ * Dispatcher Installer
  * 
  * @package     Comodojo dispatcher
- * @author      Marco Giovinazzi <info@comodojo.org>
+ * @author      Marco Giovinazzi <marco.giovinazzi@comodojo.org>
  * @license     GPL-3.0+
  *
  * LICENSE:
@@ -27,21 +30,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Composer\Script\Event;
-use Composer\Installer\PackageEvent;
-use \Exception;
-
-class DispatcherInstallerActions {
-
-    private static $vendor = 'vendor/';
-
-    private static $plugins_cfg = 'configs/plugins-config.php';
-
-    private static $routing_cfg = 'configs/routing-config.php';
-
-    private static $reserved_folders = Array('DispatcherInstaller','cache','configs','lib','plugins','services','templates','vendor');
-
-    private static $mask = 0644;
+class DispatcherInstallerActions extends AbstractInstaller {
 
     public static function postPackageInstall(PackageEvent $event) {
 
@@ -50,6 +39,8 @@ class DispatcherInstallerActions {
         $name = $event->getOperation()->getPackage()->getName();
 
         $extra = $event->getOperation()->getPackage()->getExtra();
+
+        if ( !in_array($type, self::$known_types) ) return;
 
         self::ascii();
 
@@ -75,6 +66,8 @@ class DispatcherInstallerActions {
 
         $extra = $event->getOperation()->getPackage()->getExtra();
 
+        if ( !in_array($type, self::$known_types) ) return;
+
         self::ascii();
 
         try {
@@ -94,15 +87,30 @@ class DispatcherInstallerActions {
     public static function postPackageUpdate(PackageEvent $event) {
 
         $initial_package = $event->getOperation()->getInitialPackage();
-        $target_package  = $event->getOperation()->getTargetPackage();
+
+        $initial_package_type = $initial_package->getType();
+
+        $initial_package_name = $initial_package->getName();
+
+        $initial_package_extra = $initial_package->getExtra();
+
+        $target_package  = $event->getOperation()->getTargetPackage(); 
+
+        $target_package_type = $target_package->getType();
+
+        $target_package_name = $target_package->getName();
+
+        $target_package_extra = $target_package->getExtra();
+
+        if ( !in_array($initial_package_type, self::$known_types) AND !in_array($target_package_type, self::$known_types) ) return;
 
         self::ascii();
 
         try {
             
-            self::packageUninstall($initial_package->getType(), $initial_package->getName(), $initial_package->getExtra());
+            self::packageUninstall($initial_package_type, $initial_package_name, $initial_package_extra);
 
-            self::packageInstall($target_package->getType(), $target_package->getName(), $target_package->getExtra());
+            self::packageInstall($target_package_type, $target_package_name, $target_package_extra);
 
         } catch (Exception $e) {
             
@@ -116,19 +124,19 @@ class DispatcherInstallerActions {
 
     private static function packageInstall($type, $name, $extra) {
 
-        $plugin_loaders = isset($extra["comodojo-plugin-load"]) ? $extra["comodojo-plugin-load"] : Array();
+        $plugins_actions = self::parsePluginExtra($extra);
 
-        $service_loaders = isset($extra["comodojo-service-route"]) ? $extra["comodojo-service-route"] : Array();
+        $service_actions = self::parseServiceExtra($extra);
 
-        $folders_to_create = isset($extra["comodojo-folders-create"]) ? $extra["comodojo-folders-create"] : Array();
+        $folders_actions = self::parseFolderExtra($extra);
 
         try {
+
+            if ( !empty($plugins_actions) ) DispatcherInstaller::loadPlugin($name, $plugins_actions);
             
-            if ( $type == "dispatcher-plugin" ) self::loadPlugin($name, $plugin_loaders);
+            if ( !empty($service_actions) ) DispatcherInstaller::loadService($name, $service_actions);
 
-            if ( $type == "dispatcher-service-bundle" ) self::loadService($name, $service_loaders);
-
-            self::create_folders($folders_to_create);
+            if ( !empty($folders_actions) ) FileInstaller::createFolders($folders_actions);
 
         } catch (Exception $e) {
             
@@ -140,15 +148,19 @@ class DispatcherInstallerActions {
 
     private static function packageUninstall($type, $name, $extra) {
         
-        $folders_to_delete = isset($extra["comodojo-folders-create"]) ? $extra["comodojo-folders-create"] : Array();
+        $plugins_actions = self::parsePluginExtra($extra);
+
+        $service_actions = self::parseServiceExtra($extra);
+
+        $folders_actions = self::parseFolderExtra($extra);
 
         try {
+
+            if ( !empty($plugins_actions) ) DispatcherInstaller::unloadPlugin($name);
             
-            if ( $type == "dispatcher-plugin" ) self::unloadPlugin($name);
+            if ( !empty($service_actions) ) DispatcherInstaller::unloadService($name);
 
-            if ( $type == "dispatcher-service-bundle" ) self::unloadService($name);
-
-            self::delete_folders($folders_to_delete);
+            if ( !empty($folders_actions) ) FileInstaller::deleteFolders($folders_actions);
 
         } catch (Exception $e) {
             
@@ -158,270 +170,69 @@ class DispatcherInstallerActions {
 
     }
 
-    private static function loadPlugin($package_name, $package_loader) {
+    private static function parsePluginExtra($extra) {
 
-        $line_mark = "/****** PLUGIN - ".$package_name." - PLUGIN ******/";
+        if ( isset($extra["comodojo-plugin-load"]) ) {
 
-        list($author,$name) = explode("/", $package_name);
+            $return = $extra["comodojo-plugin-load"];
 
-        $plugin_path = self::$vendor.$author."/".$name."/src/";
+        } else if ( isset($extra["dispatcher-plugin-load"]) ) {
 
-        if ( is_array($package_loader) ) {
+            $return = $extra["dispatcher-plugin-load"];
 
-            $line_load = "";
+        } else {
 
-            foreach ($package_loader as $loader) {
-
-                echo "+ Enabling plugin ".$loader."\n";
-
-                $line_load .= '$dispatcher->loadPlugin("'.$loader.'", "'.$plugin_path.'");'."\n";
-
-            }
+            $return = array();
 
         }
-        else {
 
-            echo "+ Enabling plugin ".$package_loader."\n";
-
-            $line_load = '$dispatcher->loadPlugin("'.$package_loader.'", "'.$plugin_path.'");'."\n";
-
-        }
-        
-        $to_append = "\n".$line_mark."\n".$line_load.$line_mark."\n";
-
-        $action = file_put_contents(self::$plugins_cfg, $to_append, FILE_APPEND | LOCK_EX);
-
-        if ( $action === false ) throw new Exception("Cannot activate plugin");
+        return $return;
 
     }
 
-    private static function unloadPlugin($package_name) {
+    private static function parseServiceExtra($extra) {
 
-        echo "- Disabling plugin ".$package_name."\n";
+        if ( isset($extra["comodojo-service-route"]) ) {
 
-        $line_mark = "/****** PLUGIN - ".$package_name." - PLUGIN ******/";
+            $return = $extra["comodojo-service-route"];
 
-        $cfg = file(self::$plugins_cfg, FILE_IGNORE_NEW_LINES);
+        } else if ( isset($extra["dispatcher-service-route"]) ) {
 
-        $found = false;
+            $return = $extra["dispatcher-service-route"];
 
-        foreach ($cfg as $position => $line) {
-            
-            if ( stristr($line, $line_mark) ) {
+        } else {
 
-                unset($cfg[$position]);
-
-                $found = !$found;
-
-            }
-
-            else {
-
-                if ( $found ) unset($cfg[$position]);
-                else continue;
-
-            }
+            $return = array();
 
         }
 
-        $action = file_put_contents(self::$plugins_cfg, implode("\n", array_values($cfg)), LOCK_EX);
-
-        if ( $action === false ) throw new Exception("Cannot deactivate plugin");
+        return $return;
 
     }
 
-    private static function loadService($package_name, $package_loader) {
+    private static function parseFolderExtra($extra) {
 
-        $line_mark = "/****** SERVICE - ".$package_name." - SERVICE ******/";
+        if ( isset($extra["comodojo-folders-create"]) ) {
 
-        $line_load = "";
+            $return = $extra["comodojo-folders-create"];
 
-        list($author,$name) = explode("/", $package_name);
+        } else if ( isset($extra["folder-create"]) ) {
 
-        $service_path = self::$vendor.$author."/".$name."/services/";
+            $return = $extra["folder-create"];
 
-        if ( is_array($package_loader) ) {
+        } else {
 
-            foreach ($package_loader as $pload) {
-
-                if ( !array_key_exists("service",$pload) OR !array_key_exists("type",$pload) OR !array_key_exists("target",$pload) ) throw new Exception("Wrong service route");
-
-                $service = $pload["service"];
-                $type = $pload["type"];
-                
-                if ( array_key_exists("relative",$pload) ) $relative = filter_var($pload["relative"], FILTER_VALIDATE_BOOLEAN);
-                else $relative = false;
-
-                if ( $relative ) $target = $pload["target"];
-                else $target = $service_path.$pload["target"];
-
-                echo "+ Enabling ".($relative ? "relative" : "absolute")." route for service ".$service."(".$package_name.")\n";
-
-                if ( isset($pload["parameters"]) AND @is_array($pload["parameters"]) ) {
-                    $line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", ' . var_export($pload["parameters"], true) . ', '.($relative ? 'true' : 'false').');'."\n";
-                }
-                else {
-                    $line_load .= '$dispatcher->setRoute("'.$service.'", "'.$type.'", "'.$target.'", Array(), '.($relative ? 'true' : 'false').');'."\n";
-                }
-
-            }
-
-        }
-        else throw new Exception("Wrong service loader");
-        
-        $to_append = "\n".$line_mark."\n".$line_load.$line_mark."\n";
-
-        $action = file_put_contents(self::$routing_cfg, $to_append, FILE_APPEND | LOCK_EX);
-
-        if ( $action === false ) throw new Exception("Cannot activate service route");
-
-    }
-
-    private static function unloadService($package_name) {
-
-        echo "- Disabling route for services of ".$package_name."\n";
-
-        $line_mark = "/****** SERVICE - ".$package_name." - SERVICE ******/";
-
-        $cfg = file(self::$routing_cfg, FILE_IGNORE_NEW_LINES);
-
-        $found = false;
-
-        foreach ($cfg as $position => $line) {
-            
-            if ( stristr($line, $line_mark) ) {
-
-                unset($cfg[$position]);
-
-                $found = !$found;
-
-            }
-
-            else {
-
-                if ( $found ) unset($cfg[$position]);
-                else continue;
-
-            }
+            $return = array();
 
         }
 
-        $action = file_put_contents(self::$routing_cfg, implode("\n", array_values($cfg)), LOCK_EX);
-
-        if ( $action === false ) throw new Exception("Cannot deactivate route");
-
-    }
-
-    private static function create_folders($folders) {
-
-        if ( is_array($folders) ) {
-
-            foreach ($folders as $folder) {
-                
-                if ( in_array($folder, self::$reserved_folders) ) throw new Exception("Cannot overwrite reserved folder!");
-
-                echo "+ Creating folder ".$folder."\n";
-
-                $action = mkdir($folder, self::$mask, true);
-
-                if ( $action === false ) throw new Exception("Error creating folder ".$folder);
-
-            }
-
-        }
-
-        else {
-
-            if ( in_array($folders, self::$reserved_folders) ) throw new Exception("Cannot overwrite reserved folder!");
-
-            echo "+ Creating folder ".$folders."\n";
-
-            $action = mkdir($folders, self::$mask, true);
-
-            if ( $action === false ) throw new Exception("Error creating folder ".$folders);
-
-        }
-
-        echo "+ PLEASE REMEMBER to chmod and/or chown created folders according to your needs.\n";
-
-    }
-
-    private static function delete_folders($folders) {
-        
-        if ( is_array($folders) ) {
-
-            foreach ($folders as $folder) {
-                
-                if ( in_array($folder, self::$reserved_folders) ) throw new Exception("Cannot delete reserved folder!");
-
-                echo "- deleting folder ".$folder."\n";
-
-                try {
-
-                    self::recursive_unlink($folder);
-                    
-                } catch (Exception $e) {
-                    
-                    throw $e;
-
-                }
-
-            }
-
-        }
-
-        else {
-
-            if ( in_array($folders, self::$reserved_folders) ) throw new Exception("Cannot overwrite reserved folder!");
-
-            echo "- deleting folder ".$folders."\n";
-
-            try {
-
-                self::recursive_unlink($folders);
-                
-            } catch (Exception $e) {
-                
-                throw $e;
-
-            }
-
-        }
-
-    }
-
-    private static function recursive_unlink($folder) {
-
-        foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $path) {
-            
-            $pathname = $path->getPathname();
-
-            if ( $path->isDir() ) {
-
-                $action = rmdir($pathname);
-
-            } 
-            else {
-
-                $action = unlink($pathname);
-
-            }
-
-            if ( $action === false ) throw new Exception("Error deleting ".$pathname." during recursive unlink of folder ".$folder);
-
-        }
-
-        $action = rmdir($folder);
-
-        if ( $action === false ) throw new Exception("Error deleting folder ".$folder);
+        return $return;
 
     }
 
     private static function ascii() {
 
-        echo "\n+-++-++-++-++-++-++-++-+ +-++-++-++-++-++-++-++-++-++-+\n";
-        echo "|C||o||m||o||d||o||j||o| |d||i||s||p||a||t||c||h||e||r|\n";
-        echo "+-++-++-++-++-++-++-++-+ +-++-++-++-++-++-++-++-++-++-+\n\n";
+        echo file_get_contents("DispatcherInstaller/logo.ascii")."\n";
 
     }
 

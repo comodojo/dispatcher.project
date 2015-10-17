@@ -1,17 +1,17 @@
 <?php
 
 /**
- * This is the plugin configuration file
+ * This is the routing table configuration file
  *
  * It should contain method invocations like:
  *
- *  $dispatcher->loadPlugin("[PLUGIN_NAME]", (optional)"[PLUGIN_FOLDER]");
+ *  $dispatcher->setRoute("[SERVICE]", "[ROUTE_TYPE]", "[ROUTE_TARGET]", (optional)"[PARAMETERS]", (optional)"[RELATIVE]");
  *
  * WARNING: DO NOT close PHP tag in this file!
  *
  * @package     Comodojo dispatcher
- * @author		Marco Giovinazzi <info@comodojo.org>
- * @license		GPL-3.0+
+ * @author      Marco Giovinazzi <marco.giovinazzi@comodojo.org>
+ * @license     GPL-3.0+
  *
  * LICENSE:
  * 

@@ -6,8 +6,8 @@ use Comodojo\Dispatcher\Dispatcher;
  * Comodojo dispatcher - REST services microframework
  * 
  * @package     Comodojo dispatcher
- * @author		Marco Giovinazzi <info@comodojo.org>
- * @license		GPL-3.0+
+ * @author      Marco Giovinazzi <marco.giovinazzi@comodojo.org>
+ * @license     GPL-3.0+
  *
  * LICENSE:
  * 
@@ -66,7 +66,7 @@ $dispatcher = new Dispatcher();
  | routing configuration.
  |
  */
-require "configs/routing-config.php";
+require "configs/dispatcher-routing-config.php";
 
 /*
  |--------------------------------
@@ -76,7 +76,7 @@ require "configs/routing-config.php";
  | Load installed plugins
  |
  */
-require "configs/plugins-config.php";
+require "configs/dispatcher-plugins-config.php";
 
 /*
  |--------------------------------

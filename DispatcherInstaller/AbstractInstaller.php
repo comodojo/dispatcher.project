@@ -1,17 +1,11 @@
-<?php
+<?php namespace Comodojo\DispatcherInstaller;
 
 /**
- * This is the routing table configuration file
- *
- * It should contain method invocations like:
- *
- *  $dispatcher->setRoute("[SERVICE]", "[ROUTE_TYPE]", "[ROUTE_TARGET]", (optional)"[PARAMETERS]", (optional)"[RELATIVE]");
- *
- * WARNING: DO NOT close PHP tag in this file!
+ * Dispatcher Installer 
  *
  * @package     Comodojo dispatcher
- * @author		Marco Giovinazzi <info@comodojo.org>
- * @license		GPL-3.0+
+ * @author      Marco Giovinazzi <marco.giovinazzi@comodojo.org>
+ * @license     GPL-3.0+
  *
  * LICENSE:
  * 
@@ -29,3 +23,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+abstract class AbstractInstaller {
+
+    protected static $known_types = array('dispatcher-plugin', 'dispatcher-service-bundle', 'comodojo-bundle');
+
+    protected static $reserved_folders = array('DispatcherInstaller','cache','configs','lib','plugins','services','templates','vendor');
+
+    protected static $vendor = 'vendor/';
+
+    protected static $dispatcher_plugins_cfg = 'configs/dispatcher-plugins-config.php';
+
+    protected static $dispatcher_routing_cfg = 'configs/dispatcher-routing-config.php';
+
+    protected static $mask = 0644;
+
+}

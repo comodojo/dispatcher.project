@@ -11,14 +11,15 @@
         "comodojo",
         "installer"
     ],
-    "homepage": "http://dispatcher.comodojo.org",
+    "homepage": "https://dispatcher.comodojo.org",
      "support": {
         "issues": "https://github.com/comodojo/dispatcher.project/issues"
     },
     "authors": [
         {
             "name": "Marco Giovinazzi",
-            "email": "info@comodojo.org"
+            "email": "marco.giovinazzi@comodojo.org",
+            "homepage": "http://jme.altervista.org"
         }
     ],
     "autoload": {
