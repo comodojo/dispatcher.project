@@ -124,9 +124,9 @@ class DispatcherInstallerActions extends AbstractInstaller {
 
     private static function packageInstall($type, $name, $extra) {
 
-        $plugins_actions = self::parsePluginExtra($extra);
+        $plugins_actions = self::parseDispatcherPluginExtra($extra);
 
-        $service_actions = self::parseServiceExtra($extra);
+        $service_actions = self::parseDispatcherServiceExtra($extra);
 
         $folders_actions = self::parseFolderExtra($extra);
 
@@ -148,9 +148,9 @@ class DispatcherInstallerActions extends AbstractInstaller {
 
     private static function packageUninstall($type, $name, $extra) {
         
-        $plugins_actions = self::parsePluginExtra($extra);
+        $plugins_actions = self::parseDispatcherPluginExtra($extra);
 
-        $service_actions = self::parseServiceExtra($extra);
+        $service_actions = self::parseDispatcherServiceExtra($extra);
 
         $folders_actions = self::parseFolderExtra($extra);
 
@@ -170,7 +170,7 @@ class DispatcherInstallerActions extends AbstractInstaller {
 
     }
 
-    private static function parsePluginExtra($extra) {
+    private static function parseDispatcherPluginExtra($extra) {
 
         if ( isset($extra["comodojo-plugin-load"]) ) {
 
@@ -190,7 +190,7 @@ class DispatcherInstallerActions extends AbstractInstaller {
 
     }
 
-    private static function parseServiceExtra($extra) {
+    private static function parseDispatcherServiceExtra($extra) {
 
         if ( isset($extra["comodojo-service-route"]) ) {
 
