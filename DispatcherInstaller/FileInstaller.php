@@ -4,13 +4,13 @@ use Comodojo\DispatcherInstaller\AbstractInstaller;
 
 /**
  * Dispatcher Installer
- * 
+ *
  * @package     Comodojo dispatcher
  * @author      Marco Giovinazzi <marco.giovinazzi@comodojo.org>
  * @license     GPL-3.0+
  *
  * LICENSE:
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -32,7 +32,7 @@ class FileInstaller extends AbstractInstaller {
         if ( is_array($folders) ) {
 
             foreach ($folders as $folder) {
-                
+
                 if ( in_array($folder, self::$reserved_folders) ) throw new Exception("Cannot overwrite reserved folder!");
 
                 echo "+ Creating folder ".$folder."\n";
@@ -62,11 +62,11 @@ class FileInstaller extends AbstractInstaller {
     }
 
     public static function deleteFolders($folders) {
-        
+
         if ( is_array($folders) ) {
 
             foreach ($folders as $folder) {
-                
+
                 if ( in_array($folder, self::$reserved_folders) ) throw new Exception("Cannot delete reserved folder!");
 
                 echo "- deleting folder ".$folder."\n";
@@ -74,9 +74,9 @@ class FileInstaller extends AbstractInstaller {
                 try {
 
                     self::recursiveUnlink($folder);
-                    
+
                 } catch (Exception $e) {
-                    
+
                     throw $e;
 
                 }
@@ -94,9 +94,9 @@ class FileInstaller extends AbstractInstaller {
             try {
 
                 self::recursiveUnlink($folders);
-                
+
             } catch (Exception $e) {
-                
+
                 throw $e;
 
             }
@@ -108,14 +108,14 @@ class FileInstaller extends AbstractInstaller {
     public static function recursiveUnlink($folder) {
 
         foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($folder, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST) as $path) {
-            
+
             $pathname = $path->getPathname();
 
             if ( $path->isDir() ) {
 
                 $action = rmdir($pathname);
 
-            } 
+            }
             else {
 
                 $action = unlink($pathname);

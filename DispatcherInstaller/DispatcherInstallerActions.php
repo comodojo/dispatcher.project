@@ -9,13 +9,13 @@ use \Exception;
 
 /**
  * Dispatcher Installer
- * 
+ *
  * @package     Comodojo dispatcher
  * @author      Marco Giovinazzi <marco.giovinazzi@comodojo.org>
  * @license     GPL-3.0+
  *
  * LICENSE:
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -45,13 +45,13 @@ class DispatcherInstallerActions extends AbstractInstaller {
         self::ascii();
 
         try {
-            
+
             self::packageInstall($type, $name, $extra);
 
         } catch (Exception $e) {
 
             throw $e;
-            
+
         }
 
         echo "+ DispatcherInstaller install task completed\n\n";
@@ -71,13 +71,13 @@ class DispatcherInstallerActions extends AbstractInstaller {
         self::ascii();
 
         try {
-            
+
             self::packageUninstall($type, $name, $extra);
 
         } catch (Exception $e) {
 
             throw $e;
-            
+
         }
 
         echo "- DispatcherInstaller uninstall task completed\n\n";
@@ -94,7 +94,7 @@ class DispatcherInstallerActions extends AbstractInstaller {
 
         $initial_package_extra = $initial_package->getExtra();
 
-        $target_package  = $event->getOperation()->getTargetPackage(); 
+        $target_package  = $event->getOperation()->getTargetPackage();
 
         $target_package_type = $target_package->getType();
 
@@ -107,13 +107,13 @@ class DispatcherInstallerActions extends AbstractInstaller {
         self::ascii();
 
         try {
-            
+
             self::packageUninstall($initial_package_type, $initial_package_name, $initial_package_extra);
 
             self::packageInstall($target_package_type, $target_package_name, $target_package_extra);
 
         } catch (Exception $e) {
-            
+
             throw $e;
 
         }
@@ -133,21 +133,21 @@ class DispatcherInstallerActions extends AbstractInstaller {
         try {
 
             if ( !empty($plugins_actions) ) DispatcherInstaller::loadPlugin($name, $plugins_actions);
-            
+
             if ( !empty($service_actions) ) DispatcherInstaller::loadService($name, $service_actions);
 
             if ( !empty($folders_actions) ) FileInstaller::createFolders($folders_actions);
 
         } catch (Exception $e) {
-            
+
             throw $e;
-            
+
         }
 
     }
 
     private static function packageUninstall($type, $name, $extra) {
-        
+
         $plugins_actions = self::parseDispatcherPluginExtra($extra);
 
         $service_actions = self::parseDispatcherServiceExtra($extra);
@@ -157,15 +157,15 @@ class DispatcherInstallerActions extends AbstractInstaller {
         try {
 
             if ( !empty($plugins_actions) ) DispatcherInstaller::unloadPlugin($name);
-            
+
             if ( !empty($service_actions) ) DispatcherInstaller::unloadService($name);
 
             if ( !empty($folders_actions) ) FileInstaller::deleteFolders($folders_actions);
 
         } catch (Exception $e) {
-            
+
             throw $e;
-            
+
         }
 
     }

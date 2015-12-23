@@ -4,13 +4,13 @@ use Comodojo\DispatcherInstaller\AbstractInstaller;
 
 /**
  * Dispatcher Installer
- * 
+ *
  * @package     Comodojo dispatcher
  * @author      Marco Giovinazzi <marco.giovinazzi@comodojo.org>
  * @license     GPL-3.0+
  *
  * LICENSE:
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
@@ -55,7 +55,7 @@ class DispatcherInstaller extends AbstractInstaller {
             $line_load = '$dispatcher->loadPlugin("'.$package_loader.'", "'.$plugin_path.'");'."\n";
 
         }
-        
+
         $to_append = "\n".$line_mark."\n".$line_load.$line_mark."\n";
 
         $action = file_put_contents(self::$dispatcher_plugins_cfg, $to_append, FILE_APPEND | LOCK_EX);
@@ -75,7 +75,7 @@ class DispatcherInstaller extends AbstractInstaller {
         $found = false;
 
         foreach ($cfg as $position => $line) {
-            
+
             if ( stristr($line, $line_mark) ) {
 
                 unset($cfg[$position]);
@@ -117,7 +117,7 @@ class DispatcherInstaller extends AbstractInstaller {
 
                 $service = $pload["service"];
                 $type = $pload["type"];
-                
+
                 if ( array_key_exists("relative",$pload) ) $relative = filter_var($pload["relative"], FILTER_VALIDATE_BOOLEAN);
                 else $relative = false;
 
@@ -137,7 +137,7 @@ class DispatcherInstaller extends AbstractInstaller {
 
         }
         else throw new Exception("Wrong service loader");
-        
+
         $to_append = "\n".$line_mark."\n".$line_load.$line_mark."\n";
 
         $action = file_put_contents(self::$dispatcher_routing_cfg, $to_append, FILE_APPEND | LOCK_EX);
@@ -157,7 +157,7 @@ class DispatcherInstaller extends AbstractInstaller {
         $found = false;
 
         foreach ($cfg as $position => $line) {
-            
+
             if ( stristr($line, $line_mark) ) {
 
                 unset($cfg[$position]);
